@@ -6,3 +6,48 @@ gzip -d SRR292678sub_S1_L001_R1_001.fastq.gz SRR292678sub_S1_L001_R2_001.fastq.g
 fastqc SRR292678sub_S1_L001_R1_001.fastq SRR292678sub_S1_L001_R2_001.fastq SRR292770_S1_L001_R1_001.fastq SRR292770_S1_L001_R2_001.fastq SRR292862_S2_L001_R1_001.fastq SRR292862_S2_L001_R2_001.fastq
 Создаю отчеты FastQC для всех ридов, и нахожу число ридов для каждого файла 5499346, 5499346, 5102041, 5102041, 5102041, 5102041
 
+
+Поэтому скачиваем риды выровненные и включаем в отчет QUAST 
+
+# contigs	210 N50	111860
+
+Скачиваем общее выравнивание и смотрим отчет QUAST 
+
+# contigs	105 N50	335515
+
+[20:32:11] Contig ID must <= 37 chars long: NODE_1_length_2815616_cov_74.3819_ID_564387
+[20:32:11] Please rename your contigs OR try '--centre X --compliant' to generate clean contig names.
+
+Запускаем Prokka и выходит ошибка
+
+[20:32:11] Contig ID must <= 37 chars long: NODE_1_length_2815616_cov_74.3819_ID_564387
+[20:32:11] Please rename your contigs OR try '--centre X --compliant' to generate clean contig names.
+
+Нахожу исправление ошибки https://github.com/tseemann/prokka/issues/135 
+
+sed -re 's/(_length)[^=]*$/\1/' $ ./contigs.fasta > /.contigs_without_id.fasta
+
+Убираем ID и записываем в файл
+
+Запускаем Prokka со стандартными настройками и получаем gff-файл и другие
+
+Запускаем Barrnap на сборке трёх библиотек и находим 16S РНК, 6 штук
+
+NODE_16_length_113537_cov_78.5276_ID_565907	barrnap:0.8	rRNA	111955	113492	0	+	.	Name=16S_rRNA;product=16S ribosomal RNA
+NODE_1_length_698474_cov_70.3598_ID_565849	barrnap:0.8	rRNA	46	1583	0	-	.	Name=16S_rRNA;product=16S ribosomal RNA
+NODE_24_length_45417_cov_81.3463_ID_565899	barrnap:0.8	rRNA	43835	45372	0	+	.	Name=16S_rRNA;product=16S ribosomal RNA
+NODE_25_length_38063_cov_95.809_ID_565903	barrnap:0.8	rRNA	36481	38018	0	+	.	Name=16S_rRNA;product=16S ribosomal RNA
+NODE_5_length_353792_cov_75.7002_ID_565879	barrnap:0.8	rRNA	42579	44116	0	-	.	Name=16S_rRNA;product=16S ribosomal RNA
+NODE_7_length_269063_cov_84.1067_ID_565845	barrnap:0.8	rRNA	46	1583	0	-	.	Name=16S_rRNA;product=16S ribosomal RNA
+
+Ищем в BLAST похожую на нашу бактерию, с настройками “Reference genomic sequences” в “Database”, "Entrez Query"  1900/01/01:2011/01/01[PDAT] по контигу 16 и находим похожую бактерию
+
+Escherichia coli 55989, complete sequence
+
+Создаем FASTA-файл
+
+NCBI Reference Sequence: NC_011748.1
+
+У контига 24 тот же референс, у гена 5S такое же совпадение 
+
+Per. Ident 99.98%	
